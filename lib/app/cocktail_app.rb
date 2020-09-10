@@ -127,22 +127,15 @@ class CocktailApp
 
   def add_user_drink
     drink_name = $prompt.ask("What do you want to call your drink?" , required: true)
-    new_drink = Drink.create( name: drink_name, user_id: @user.id, alcoholic: true) #instructions: nil)
+    new_drink = Drink.create( name: drink_name, user_id: @user.id, alcoholic: true, instructions: nil)
     UserDrink.create(user_id: @user.id, drink_id: new_drink.id)
 
     is_alcoholic = $prompt.yes?("Does your drink contain alcohol?", required: true)
     if is_alcoholic == false
       new_drink.alcoholic = false
     end
-    
-    # 3. add ingredient multiple input question
-    # add ingredient (Ingredient.find_or_create() save ID as a variable)
-    # add measurement ()
     add_ingredient(new_drink)
-    # 5. add instructions ( new_drink.instructions = 'response')
-    
-    # add_instructions(new_drink)
-    # returns user to main_menu
+    add_instructions(new_drink)
     # review drink - setup with same structure as a normal drink layout
     main_menu
   end
@@ -152,14 +145,10 @@ class CocktailApp
       q.modify :down, :strip
     end
     new_ingredient = Ingredient.find_or_create_by(name: ingredient)
-    # ask how much of ingredient here (string)
     measurement = $prompt.ask("How much of #{ingredient}?" , required: true) do |q|
       q.modify :down, :strip
     end
-    # create new DrinkIngredient here
-    DrinkIngredient.create(drink_id: new_drink.id, ingredient_id: new_ingredient.id) # ,measurement: measurement)
-
-    # menu: add another ingredient or add instructions(returns back to add user_drink method)
+    DrinkIngredient.create(drink_id: new_drink.id, ingredient_id: new_ingredient.id,measurement: measurement)
     choices = ["add another ingredient", "I'm done adding ingredients"]
     countinue_adding = $prompt.multi_select("What's next?", choices, required: true, max: 1)
     if countinue_adding == ['add another ingredient'] 
@@ -167,12 +156,12 @@ class CocktailApp
     end
   end
 
-  # def add_instructions(new_drink)
-  #   instructions = $prompt.ask("Write some instructions for your drink" , required: true) do |q|
-  #     q.modify :down, :strip
-  #   end
-  #   new_drink.instructions = instructions
-  # end
+  def add_instructions(new_drink)
+    instructions = $prompt.ask("Write some instructions for your drink" , required: true) do |q|
+      q.modify :down, :strip
+    end
+    new_drink.instructions = instructions
+  end
 
 end
 # binding.pry
