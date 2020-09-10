@@ -73,7 +73,23 @@ def log_in
 end
 
 def main_menu
-  puts "#{@user.name}"
+  # drinks = GetDrinks.new
+  # puts "have random #{drinks.get_drink_name} on us..."
+  choices = ['Search for drinks', 'Add your own drink', 'Favorites']
+  main_menu_response = $prompt.multi_select("Alright #{@user.name}, what's next", choices, required: true, max: 1)
+  if main_menu_response == ['Search for drinks']
+    puts "Let's go find you a drink!"
+  elsif main_menu_response == ['Add your own drink']
+    puts "Let's add your own creation!"
+  elsif main_menu_response == ['Favorites']
+    puts "Let's checkout your favorites"
+  end
+  # multiple choice question here: max: 1
+  # 1: Find a drink by indgredient(s)
+  # 2: Find a drink by ...
+  # 3: Add your own drink
+  # 4: Favorites
+
 end
 
 end
