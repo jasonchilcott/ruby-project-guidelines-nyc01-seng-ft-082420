@@ -81,9 +81,11 @@ class CocktailApp
       puts "Let's go find you a drink!"
     elsif main_menu_response == ['Add your own drink']
       puts "Let's add your own creation!"
+      add_user_drink
     elsif main_menu_response == ['Favorites']
       puts "Let's checkout your favorites"
     end
+
     # multiple choice question here: max: 1
     # 1: Find a drink by indgredient(s)
     # 2: Find a drink by ...
@@ -91,7 +93,7 @@ class CocktailApp
     # 4: Favorites
 
   end
-  
+
   def find_drink_by_ingredients
     # "Please enter an igredient"
     # would you like to enter another (repeat until they say no)
@@ -124,17 +126,53 @@ class CocktailApp
   end
 
   def add_user_drink
-    # question prompts in order
-      # 1. add Drink name ( 
-        # new_drink = Drink.create(name:'name', user_id: @user.id, alcoholic: true, instructions: nil)
-        # UserDrink.create(user_id: @user.id, drink_id: new_drink.id)
-        # )
-      # 2. Is drink alcoholic (new_drink.alcoholic = 'response')
-      # 3. add ingredient multiple input question
-        # add ingredient (Ingredient.find_or_create() save ID as a variable)
-        # add measurement ()
-      # 4. repeat add ingredient or move forward
-      # 5. add instructions ( new_drink.instructions = 'response')
-      # returns user to main_menu
+    drink_name = $prompt.ask("What do you want to call your drink?" , required: true)
+    new_drink = Drink.create( name: drink_name, user_id: @user.id, alcoholic: true) #instructions: nil)
+    UserDrink.create(user_id: @user.id, drink_id: new_drink.id)
+
+    is_alcoholic = $prompt.yes?("Does your drink contain alcohol?", required: true)
+    if is_alcoholic == false
+      new_drink.alcoholic = false
+    end
+    
+    # 3. add ingredient multiple input question
+    # add ingredient (Ingredient.find_or_create() save ID as a variable)
+    # add measurement ()
+    add_ingredient(new_drink)
+    # 5. add instructions ( new_drink.instructions = 'response')
+    
+    # add_instructions(new_drink)
+    # returns user to main_menu
+    # review drink - setup with same structure as a normal drink layout
+    main_menu
   end
+
+  def add_ingredient(new_drink)
+    ingredient = $prompt.ask("Ingredient Name?" , required: true) do |q|
+      q.modify :down, :strip
+    end
+    new_ingredient = Ingredient.find_or_create_by(name: ingredient)
+    # ask how much of ingredient here (string)
+    measurement = $prompt.ask("How much of #{ingredient}?" , required: true) do |q|
+      q.modify :down, :strip
+    end
+    # create new DrinkIngredient here
+    DrinkIngredient.create(drink_id: new_drink.id, ingredient_id: new_ingredient.id) # ,measurement: measurement)
+
+    # menu: add another ingredient or add instructions(returns back to add user_drink method)
+    choices = ["add another ingredient", "I'm done adding ingredients"]
+    countinue_adding = $prompt.multi_select("What's next?", choices, required: true, max: 1)
+    if countinue_adding == ['add another ingredient'] 
+      add_ingredient(new_drink)
+    end
+  end
+
+  # def add_instructions(new_drink)
+  #   instructions = $prompt.ask("Write some instructions for your drink" , required: true) do |q|
+  #     q.modify :down, :strip
+  #   end
+  #   new_drink.instructions = instructions
+  # end
+
 end
+# binding.pry

@@ -27,7 +27,7 @@ di4 = DrinkIngredient.create(drink_id: bloody.id, ingredient_id: vodka.id)
 di5 = DrinkIngredient.create(drink_id: vod_red.id, ingredient_id: vodka.id)
 
 
-doc_venture = User.create(name: "Dr. Venture", email: "dr@venture.com", password: "Hank!!!")
+doc_venture = User.create(name: "Dr. Venture", email: "dr@venture.com", password: "rusty")
 hank = User.create(name: "Hank Venture", email: "hank@venture.com", password: "I'm batman")
 monarch = User.create(name: "The Monarch", email: "monarch@theguild.com", password: "Fresca")
 
