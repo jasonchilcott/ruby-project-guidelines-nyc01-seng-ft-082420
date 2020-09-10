@@ -35,5 +35,8 @@ class GetDrinks
   end
 end
 
+## this code is to quickly check your endpoint and hash interation ##
+
+
 # drinks = GetDrinks.new
 # puts drinks.get_drink_name
