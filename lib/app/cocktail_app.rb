@@ -43,11 +43,13 @@ def sign_up
 end
 
 def log_in 
-  # puts 'logging in...'
+  # find_user = $prompt.ask("Name:", required: true)
+
   find_user = $prompt.collect do
     key(:name).ask("Name:", required: true)
     key(:password).mask("Password:", required: true)
   end
+
   # if false try again or kick to sign up here
   @user = User.find_by(name: find_user[:name])
   if find_user[:password] != @user.password
@@ -62,5 +64,6 @@ end
 def main_menu
   puts "#{@user.name}"
 end
+
 
 end
