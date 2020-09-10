@@ -11,7 +11,7 @@ class GetDrinks
 
 
   # this will have to be a url base eventually, for now it is fixed
-  URL = 'https://www.thecocktaildb.com/api/json/v1/1/random.php'
+  URL = 'https://www.thecocktaildb.com/api/json/v2/9973533/random.php'
 
   def get_drinks
     uri = URI.parse(URL)
@@ -34,12 +34,19 @@ class GetDrinks
     #binding.pry
   end
 
-  def get_drink_instructions
-    
+  def get_drink_with_instructions
     drinks_hash = JSON.parse(self.get_drinks)
     drink_name = drinks_hash["drinks"][0]["strDrink"]
     drink_instructions = drinks_hash["drinks"][0]["strInstructions"]
-    "#{drink_name} \n #{drink_instructions}"
+    ing1 = drinks_hash["drinks"][0]["strIngredient1"]
+    ing2 = drinks_hash["drinks"][0]["strIngredient2"]
+    ing3 = drinks_hash["drinks"][0]["strIngredient3"]
+    ing4 = drinks_hash["drinks"][0]["strIngredient4"]
+    meas1 = drinks_hash["drinks"][0]["strMeasure1"]
+    meas2 = drinks_hash["drinks"][0]["strMeasure2"]
+    meas3 = drinks_hash["drinks"][0]["strMeasure3"]
+    meas4 = drinks_hash["drinks"][0]["strMeasure4"]
+    "#{drink_name}: \n#{ing1}: #{meas1}\n#{ing2}: #{meas2}\n#{ing3}: #{meas3}\n#{ing4}: #{meas4}\n#{drink_instructions}"
     #binding.pry
   end
 
@@ -51,4 +58,4 @@ end
 
 
 drinks = GetDrinks.new
-puts drinks.get_drink_instructions
+puts drinks.get_drink_with_instructions
