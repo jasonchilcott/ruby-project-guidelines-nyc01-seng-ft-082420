@@ -42,24 +42,45 @@ def sign_up
   User.create(name: new_user[:name], email: new_user[:email_address], password: new_user[:password])
 end
 
-def log_in 
-  # find_user = $prompt.ask("Name:", required: true)
-
-  find_user = $prompt.collect do
-    key(:name).ask("Name:", required: true)
-    key(:password).mask("Password:", required: true)
+def validate_password
+  count = 0
+  while count < 3
+    validate_pw = $prompt.mask('Password', required: true)
+    if validate_pw != @user.password
+      puts "That is not a valid password"
+      count += 1
+    else return @user
+    end
   end
-
-  # if false try again or kick to sign up here
-  @user = User.find_by(name: find_user[:name])
-  if find_user[:password] != @user.password
-    puts "That password is incorrect"
-    sleep(1)
-    puts "Please log in again"
-    log_in
-  end
+  @user = nil
+  abort "Goodbye"
 end
-# binding.pry
+
+def log_in 
+  find_user = $prompt.ask("Name:", required: true)
+  # binding.pry
+
+  if User.find_by(name: find_user)
+    @user = User.find_by(name: find_user)
+    validate_password
+  else
+    puts "we don't recognize your, please sign up"
+    sleep(0.5)
+    sign_up
+  end
+
+  # find_user = $prompt.collect do
+  #   key(:name).ask("Name:", required: true)
+  #   key(:password).mask("Password:", required: true)
+  # end
+
+  # if find_user[:password] != @user.password
+  #   puts "That password is incorrect"
+  #   sleep(1)
+  #   puts "Please log in again"
+  #   log_in
+  # end
+end
 
 def main_menu
   puts "#{@user.name}"

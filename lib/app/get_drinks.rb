@@ -3,4 +3,4 @@ require 'open-uri'
 require 'json'
 require 'pry'
 
-class GetDrinks
+# class GetDrinks
