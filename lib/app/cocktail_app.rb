@@ -62,7 +62,9 @@ end
 # binding.pry
 
 def main_menu
-  puts "#{@user.name}"
+  puts "Alright #{@user.name}"
+  drinks = GetDrinks.new
+  puts "have random #{drinks.get_drink_name} on us..."
 end
 
 
