@@ -4,7 +4,6 @@ require 'pry'
 class CocktailApp
   attr_reader :user
   def run
-    # puts "Cocktail App is running!"
     welcome
     log_in_or_sign_up
     log_in
@@ -24,11 +23,12 @@ end
 
 def log_in_or_sign_up
   choices = ['log in', 'sign up']
-  action = $prompt.multi_select("What would you like to do?", choices, required: true)
+  action = $prompt.multi_select("What would you like to do?", choices, required: true, min: 1, max: 1)
     if action == ['sign up']
       sign_up
+    elsif action == ['log in']
     else
-      #catch if user doesn't answer
+      abort "Bye"
     end
 end
   
@@ -40,6 +40,7 @@ def sign_up
     key(:password).mask("Password:", required: true)
   end
   User.create(name: new_user[:name], email: new_user[:email_address], password: new_user[:password])
+  puts "Thanks for creating an account #{new_user[:name]} \nPlease log in"
 end
 
 def validate_password
@@ -58,33 +59,21 @@ end
 
 def log_in 
   find_user = $prompt.ask("Name:", required: true)
-  # binding.pry
 
   if User.find_by(name: find_user)
     @user = User.find_by(name: find_user)
     validate_password
   else
-    puts "we don't recognize your, please sign up"
+    sleep(0.5)
+    puts "We don't have you on file, please sign up"
     sleep(0.5)
     sign_up
+    log_in
   end
-
-  # find_user = $prompt.collect do
-  #   key(:name).ask("Name:", required: true)
-  #   key(:password).mask("Password:", required: true)
-  # end
-
-  # if find_user[:password] != @user.password
-  #   puts "That password is incorrect"
-  #   sleep(1)
-  #   puts "Please log in again"
-  #   log_in
-  # end
 end
 
 def main_menu
   puts "#{@user.name}"
 end
-
 
 end
