@@ -35,6 +35,7 @@ class GetDrinks
   end
 
   def get_drink_with_instructions
+    #currently works with four ingredients, no more, no less
     drinks_hash = JSON.parse(self.get_drinks)
     drink_name = drinks_hash["drinks"][0]["strDrink"]
     drink_instructions = drinks_hash["drinks"][0]["strInstructions"]
@@ -57,5 +58,5 @@ end
 ## this code is to quickly check your endpoint and hash interation ##
 
 
-drinks = GetDrinks.new
-puts drinks.get_drink_with_instructions
+#drinks = GetDrinks.new
+#puts drinks.get_drink_with_instructions
