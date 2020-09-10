@@ -51,6 +51,13 @@ class GetDrinks
     #binding.pry
   end
 
+  def save_drink_to_favorites
+
+  end
+
+  def remove_drink_from_favorites
+
+  end
 end
 
 
