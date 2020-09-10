@@ -31,12 +31,24 @@ class GetDrinks
     # puts 'getting drink Name:'
     drinks_hash = JSON.parse(self.get_drinks)
     drinks_hash["drinks"][0]["strDrink"]
-    # binding.pry
+    #binding.pry
   end
+
+  def get_drink_instructions
+    
+    drinks_hash = JSON.parse(self.get_drinks)
+    drink_name = drinks_hash["drinks"][0]["strDrink"]
+    drink_instructions = drinks_hash["drinks"][0]["strInstructions"]
+    "#{drink_name} \n #{drink_instructions}"
+    #binding.pry
+  end
+
 end
+
+
 
 ## this code is to quickly check your endpoint and hash interation ##
 
 
-# drinks = GetDrinks.new
-# puts drinks.get_drink_name
+drinks = GetDrinks.new
+puts drinks.get_drink_instructions
