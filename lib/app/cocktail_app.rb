@@ -23,7 +23,7 @@ class CocktailApp
 
   def log_in_or_sign_up
     choices = ['log in', 'sign up']
-    action = $prompt.multi_select("What would you like to do?", choices, required: true, min: 1, max: 1)
+    action = $prompt.multi_select("What would you like to do? ", choices, required: true, min: 1, max: 1)
       if action == ['sign up']
         sign_up
       elsif action == ['log in']
@@ -40,15 +40,15 @@ class CocktailApp
       key(:password).mask("Password:", required: true)
     end
     User.create(name: new_user[:name], email: new_user[:email_address], password: new_user[:password])
-    puts "Thanks for creating an account #{new_user[:name]} \nPlease log in"
+    puts "Thanks for creating an account #{new_user[:name]} \nPlease log in "
   end
 
   def validate_password
     count = 0
     while count < 3
-      validate_pw = $prompt.mask('Password', required: true)
+      validate_pw = $prompt.mask('Password:', required: true)
       if validate_pw != @user.password
-        puts "That is not a valid password"
+        puts "That is not a valid password "
         count += 1
       else return @user
       end
@@ -75,8 +75,8 @@ class CocktailApp
   def main_menu
     # drinks = GetDrinks.new
     # puts "have random #{drinks.get_drink_name} on us..."
-    choices = ['Search for drinks', 'Add your own drink', 'Favorites']
-    main_menu_response = $prompt.multi_select("Alright #{@user.name}, what's next", choices, required: true, max: 1)
+    choices = ['Search for drinks', 'Add your own drink', 'Favorites', 'Exit']
+    main_menu_response = $prompt.multi_select("Alright #{@user.name}, what's next? ", choices, required: true, max: 1)
     if main_menu_response == ['Search for drinks']
       puts "Let's go find you a drink!"
     elsif main_menu_response == ['Add your own drink']
@@ -84,14 +84,11 @@ class CocktailApp
       add_user_drink
     elsif main_menu_response == ['Favorites']
       puts "Let's checkout your favorites"
+      favorites
+    elsif main_menu_response == ['Exit']
+      puts "Goodbye"
+      abort
     end
-
-    # multiple choice question here: max: 1
-    # 1: Find a drink by indgredient(s)
-    # 2: Find a drink by ...
-    # 3: Add your own drink
-    # 4: Favorites
-
   end
 
   def find_drink_by_ingredients
@@ -163,5 +160,37 @@ class CocktailApp
     new_drink.instructions = instructions
   end
 
+  def favorites
+    # add menu here
+    # view favs, edit favs, delete a fav
+  end
+  
+  def view_favorites
+    favorites = @user.drinks
+    fav_array = favorites.map do |f|
+      f.name 
+    end
+    favorites_response = $prompt.multi_select("Choose a drink to view:", fav_array, required: true, max: 1)
+    current_drink = Drink.all.filter{|d| d.name == favorites_response[0]}
+    current_drink = current_drink[0]
+    display_fav_drink(current_drink) 
+  end
+
+  def display_fav_drink(drink)
+    # drink = drink[0]
+    puts drink.name
+    drink_ingredients = DrinkIngredient.all.filter{|di| di.drink_id == drink.id}
+    drink_ingredients.each do | drink_ingred|
+      puts "#{drink_ingred.ingredient.name}: #{drink_ingred.measurement}"
+    end
+    puts drink.instructions
+    # press enter to return to view favs
+  end
+
 end
 # binding.pry
+
+
+# To Display Favorite Drink:
+
+# Find Drink instance w/ Name
