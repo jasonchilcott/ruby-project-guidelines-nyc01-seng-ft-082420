@@ -79,11 +79,12 @@ class CocktailApp
     main_menu_response = $prompt.multi_select("Alright #{@user.name}, what's next? ", choices, required: true, max: 1)
     if main_menu_response == ['Search for drinks']
       puts "Let's go find you a drink!"
+      find_drink_by_ingredients
     elsif main_menu_response == ['Add your own drink']
-      puts "Let's add your own creation!"
+      # puts "Let's add your own creation!"
       add_user_drink
     elsif main_menu_response == ['Favorites']
-      puts "Let's checkout your favorites"
+      # puts "Let's checkout your favorites"
       favorites
     elsif main_menu_response == ['Exit']
       puts "Goodbye"
@@ -92,34 +93,80 @@ class CocktailApp
   end
 
   def find_drink_by_ingredients
-    # "Please enter an igredient"
-    # would you like to enter another (repeat until they say no)
+    ing_one = $prompt.ask("First Search Ingredient:", required: true)
+    ing_two = $prompt.ask("Another Ingredient:")
+    ing_three = $prompt.ask("One More Ingredient:")
+    ingredients = "#{ing_one} #{ing_two} #{ing_three}"
+    new = GetDrinks.new
+    drink_names = new.get_drinks(ingredients)
     
-    ## unsure how to structure api call here ##
-    ## how many ingredients can we search by - can we get the api to do all the work here? ###
-    
-    #builds an array of 10 drinks
-
-    #calls drink_names_menu(array_of_10_drinks)
-
-    
-    #############might need this code #############
-    #  new_ingredient = GetDrinks.new(ingredient)
-    #  new_ingredient
+    if drink_names == "None Found"
+      find_drink_by_ingredients
+    else
+      drink_names_menu(drink_names)
+    end
   end
   
   def drink_names_menu(drinks)
-    # turns drinks array into menu options
-
-    
-    # calls find_drink_by_name()
+    drinks = drinks.sample(8)
+    drink_names_response = $prompt.multi_select("Try one of these: ", drinks, required: true, max: 1)
+    find_drink_by_name(drink_names_response[0])
   end
   
-  def find_drink_by_name
-    # displays drink
-    # find_drink = GetDrinks.new('drink_name')
-    # find_drink.get_drink_with_instructions
-    # with question prompt at the bottom to return to drink array or main menu
+  def find_drink_by_name(drink_name)
+    new = GetDrinks.new
+    drink_data = new.get_drink_by_name(drink_name)
+    display_drink_data(drink_data)
+  end
+
+  def display_drink_data(data)
+    data = data["drinks"][0]
+    puts "Name: #{data["strDrink"]}"
+    receipe = ingredient_iterator(data)
+    display_receipe_hash(receipe)
+    puts "Instructions: #{data["strInstructions"]}"
+    choices = ['Main Menu', 'Add this drink to my favorites', 'exit']
+    post_drink_response = $prompt.multi_select("What now?", choices, required: true, max: 1)
+    if post_drink_response == ['Main Menu']
+      main_menu
+    elsif post_drink_response == ['Add this drink to my favorites']
+      add_new_drink_from_api(data)
+    else 
+      abort
+    end
+  end
+
+  def add_new_drink_from_api(data)
+    new_fav = Drink.create(name: data["strDrink"], user_id: @user.id, alcoholic: true, instructions: data["strInstructions"])
+    UserDrink.create(user_id: @user.id, drink_id: new_fav.id)
+    receipe = ingredient_iterator(data)
+    receipe.each do |key, value|
+      ing = Ingredient.find_or_create_by(name: key)
+      DrinkIngredient.create(drink_id: new_fav.id, ingredient_id: ing.id,measurement: value)
+    end
+    main_menu
+  end
+
+  def ingredient_iterator(data)
+    receipe_hash = {}
+    i = 1
+    while i < 16 do 
+      key = data["strIngredient#{i}"]
+      value = data["strMeasure#{i}"]
+      receipe_hash[key] = value
+      i+= 1
+    end
+    receipe_hash
+    # display_receipe_hash(receipe_hash)
+  end
+
+  def display_receipe_hash(receipe_hash)
+    receipe_hash.each do |k,v|
+      if v != nil
+        # binding.pry
+        puts "#{k}: #{v}"
+      end
+    end
   end
 
   def add_user_drink
@@ -133,8 +180,19 @@ class CocktailApp
     end
     add_ingredient(new_drink)
     add_instructions(new_drink)
-    # review drink - setup with same structure as a normal drink layout
+    review_new_drink(new_drink)
+    $prompt.keypress("Press space or enter to continue", keys: [:space, :return])
     main_menu
+  end
+
+  def review_new_drink(new_drink)
+    puts "Here's what your new drink looks like:"
+    puts new_drink.name
+    drink_ingredients = DrinkIngredient.all.filter{|di| di.drink_id == new_drink.id}
+    drink_ingredients.each do | drink_ingred|
+      puts "#{drink_ingred.ingredient.name}: #{drink_ingred.measurement}"
+    end
+    puts new_drink.instructions
   end
 
   def add_ingredient(new_drink)
@@ -161,8 +219,17 @@ class CocktailApp
   end
 
   def favorites
-    # add menu here
-    # view favs, edit favs, delete a fav
+    choices = ['Browse Favorites', 'Edit a Favorite', 'Remove a Favorite', 'Back to Main Menu']
+    favorites_response = $prompt.multi_select('Favorites: ', choices, required: true, max: 1)
+    if favorites_response == ['Browse Favorites']
+      display_fav_drink
+    elsif favorites_response == ['Edit a Favorite']
+      edit_favorite
+    elsif favorites_response == ['Remove a Favorite']
+      remove_favorite
+    elsif favorites_response == ['Back to Main Menu']
+      main_menu
+    end
   end
   
   def view_favorites
@@ -170,14 +237,18 @@ class CocktailApp
     fav_array = favorites.map do |f|
       f.name 
     end
-    favorites_response = $prompt.multi_select("Choose a drink to view:", fav_array, required: true, max: 1)
-    current_drink = Drink.all.filter{|d| d.name == favorites_response[0]}
+    view_favorites_response = $prompt.multi_select("Choose a drink:", fav_array, required: true, max: 1)
+    current_drink = Drink.all.filter{|d| d.name == view_favorites_response[0]}
     current_drink = current_drink[0]
-    display_fav_drink(current_drink) 
+    # display_fav_drink(current_drink)
+    current_drink 
   end
 
-  def display_fav_drink(drink)
+  def display_fav_drink #(drink)
     # drink = drink[0]
+
+    #returns a drink chosen thru menu
+    drink = view_favorites
     puts drink.name
     drink_ingredients = DrinkIngredient.all.filter{|di| di.drink_id == drink.id}
     drink_ingredients.each do | drink_ingred|
@@ -185,12 +256,38 @@ class CocktailApp
     end
     puts drink.instructions
     # press enter to return to view favs
+    favorites
   end
 
+  #### this method doesn't work yet####
+  def edit_favorite
+    puts "Pick a favorite to edit"
+    edit_drink = view_favorites
+    # 
+    if edit_drink.user_id != @user.id 
+      puts "Sorry you don't have access to edit that drink"
+    else 
+      name = $prompt.yes?("Is the name #{edit_drink.name} good?")
+      if name == 'no'
+
+      end
+      # ingredient = $prompt.yes?("Is the name #{edit_drink.name} good?")
+      # if ingredient == 'no'
+
+      # end
+
+
+    end
+
+    favorites
+  end
+
+  def remove_favorite
+    puts "Pick a favorite to remove: "
+    remove_drink = view_favorites
+    remove = UserDrink.all.find{|ud| ud.drink_id == remove_drink.id && ud.user_id == @user.id}
+    UserDrink.delete(remove.id)
+    favorites
+  end
 end
 # binding.pry
-
-
-# To Display Favorite Drink:
-
-# Find Drink instance w/ Name
