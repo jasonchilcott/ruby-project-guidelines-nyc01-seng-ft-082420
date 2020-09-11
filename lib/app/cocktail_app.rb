@@ -122,15 +122,33 @@ class CocktailApp
   def display_drink_data(data)
     data = data["drinks"][0]
     puts "Name: #{data["strDrink"]}"
-    # iterate through 15 ingredients!!!!
-    ingredient_iterator(data)
+    receipe = ingredient_iterator(data)
+    display_receipe_hash(receipe)
     puts "Instructions: #{data["strInstructions"]}"
-    abort
+    choices = ['Main Menu', 'Add this drink to my favorites', 'exit']
+    post_drink_response = $prompt.multi_select("What now?", choices, required: true, max: 1)
+    if post_drink_response == ['Main Menu']
+      main_menu
+    elsif post_drink_response == ['Add this drink to my favorites']
+      add_new_drink_from_api(data)
+    else 
+      abort
+    end
+  end
+
+  def add_new_drink_from_api(data)
+    new_fav = Drink.create(name: data["strDrink"], user_id: @user.id, alcoholic: true, instructions: data["strInstructions"])
+    UserDrink.create(user_id: @user.id, drink_id: new_fav.id)
+    receipe = ingredient_iterator(data)
+    receipe.each do |key, value|
+      ing = Ingredient.find_or_create_by(name: key)
+      DrinkIngredient.create(drink_id: new_fav.id, ingredient_id: ing.id,measurement: value)
+    end
+    main_menu
   end
 
   def ingredient_iterator(data)
     receipe_hash = {}
-    # data["strIngredient1"] : data["strMeasure1"]
     i = 1
     while i < 16 do 
       key = data["strIngredient#{i}"]
@@ -138,7 +156,8 @@ class CocktailApp
       receipe_hash[key] = value
       i+= 1
     end
-    display_receipe_hash(receipe_hash)
+    receipe_hash
+    # display_receipe_hash(receipe_hash)
   end
 
   def display_receipe_hash(receipe_hash)
