@@ -181,13 +181,11 @@ class CocktailApp
     add_ingredient(new_drink)
     add_instructions(new_drink)
     review_new_drink(new_drink)
-    
-    # press enter to return to view favs
-    
+    $prompt.keypress("Press space or enter to continue", keys: [:space, :return])
     main_menu
   end
 
-  def review_new_drink
+  def review_new_drink(new_drink)
     puts "Here's what your new drink looks like:"
     puts new_drink.name
     drink_ingredients = DrinkIngredient.all.filter{|di| di.drink_id == new_drink.id}
@@ -195,7 +193,6 @@ class CocktailApp
       puts "#{drink_ingred.ingredient.name}: #{drink_ingred.measurement}"
     end
     puts new_drink.instructions
-
   end
 
   def add_ingredient(new_drink)
