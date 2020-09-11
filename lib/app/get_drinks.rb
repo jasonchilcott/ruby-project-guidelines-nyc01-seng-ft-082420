@@ -4,21 +4,9 @@ require 'json'
 require 'pry'
 
 class GetDrinks
-  # attr_accessor :ingredients
-
-  # def initialize(ingredients)
-  #   @ingredients = ingredients
-  # end
-
-  # https://www.thecocktaildb.com/api/json/v2/9973533/filter.php?i=rum,vodka
-
+ 
   URL = 'https://www.thecocktaildb.com/api/json/v2/9973533/filter.php?i='
-  # take ingredients and add commas where whitespace is
-  # url_extension = @ingredients.split
-  
-  # this will have to be a url base eventually, for now it is fixed
-  # URL = 'https://www.thecocktaildb.com/api/json/v2/9973533/random.php'
-  
+
   def get_drinks(ingredients)
     adding = ingredients.split(' ').join(',').capitalize
     url = "#{URL}#{adding}"
@@ -36,7 +24,6 @@ class GetDrinks
   end
 
   def get_drink_by_name(name)
-    # binding.pry
     name = name.split(' ').join('_')
     base = 'https://www.thecocktaildb.com/api/json/v1/1/search.php?s='
     url = "#{base}#{name}"
@@ -44,12 +31,6 @@ class GetDrinks
     response = Net::HTTP.get_response(uri)
     drink_hash = JSON.parse(response.body)
   end
-  
-  # def get_drink_names
-  #   drinks_hash = JSON.parse(self.get_drinks)
-  #   drinks_hash["drinks"].map{|d| d['strDrink']}
-  #   # returns array of drink names
-  # end
 
   def get_drink_id
     puts 'getting drink ID #:'
@@ -82,14 +63,5 @@ class GetDrinks
     #binding.pry
   end
   
-  # def get_drink_by_id(id)
-  #   id_url = "https://www.thecocktaildb.com/api/json/v1/1/lookup.php?iid=#{id}"
-  #   uri = URI.parse(id_url)
-  #   response = Net::HTTP.get_response(uri)
-  #   # JSON.parse(response.body)
-  #   response.body
-  # end
 end
 
-# new = GetDrinks.new
-# puts new.get_drinks('vodka gin rum')

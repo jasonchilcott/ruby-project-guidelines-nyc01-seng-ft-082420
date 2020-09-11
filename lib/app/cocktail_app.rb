@@ -11,14 +11,14 @@ class CocktailApp
   end
 
   private
-
-  # methods down here
-
+  
   $prompt = TTY::Prompt.new
+
+  #### WELCOME - SIGN UP - LOG IN - MAIN MENU ####
 
   def welcome
     puts "Welcome to the Cocktail App"
-    sleep(1.5)
+    sleep(1)
   end
 
   def log_in_or_sign_up
@@ -78,13 +78,10 @@ class CocktailApp
     choices = ['Search for drinks', 'Add your own drink', 'Favorites', 'Exit']
     main_menu_response = $prompt.multi_select("Alright #{@user.name}, what's next? ", choices, required: true, max: 1)
     if main_menu_response == ['Search for drinks']
-      puts "Let's go find you a drink!"
       find_drink_by_ingredients
     elsif main_menu_response == ['Add your own drink']
-      # puts "Let's add your own creation!"
       add_user_drink
     elsif main_menu_response == ['Favorites']
-      # puts "Let's checkout your favorites"
       favorites
     elsif main_menu_response == ['Exit']
       puts "Goodbye"
@@ -92,10 +89,13 @@ class CocktailApp
     end
   end
 
+  #### SEARCH FOR DRINK #####
+
+
   def find_drink_by_ingredients
-    ing_one = $prompt.ask("First Search Ingredient:", required: true)
-    ing_two = $prompt.ask("Another Ingredient:")
-    ing_three = $prompt.ask("One More Ingredient:")
+    ing_one = $prompt.ask("Add an ingredient:", required: true)
+    ing_two = $prompt.ask("Another ingredient:")
+    ing_three = $prompt.ask("One more ingredient:")
     ingredients = "#{ing_one} #{ing_two} #{ing_three}"
     new = GetDrinks.new
     drink_names = new.get_drinks(ingredients)
@@ -169,6 +169,8 @@ class CocktailApp
     end
   end
 
+  #### ADD YOUR OWN DRINK #####
+
   def add_user_drink
     drink_name = $prompt.ask("What do you want to call your drink?" , required: true)
     new_drink = Drink.create( name: drink_name, user_id: @user.id, alcoholic: true, instructions: nil)
@@ -196,7 +198,7 @@ class CocktailApp
   end
 
   def add_ingredient(new_drink)
-    ingredient = $prompt.ask("Ingredient Name?" , required: true) do |q|
+    ingredient = $prompt.ask("Ingredient name?" , required: true) do |q|
       q.modify :down, :strip
     end
     new_ingredient = Ingredient.find_or_create_by(name: ingredient)
@@ -217,6 +219,9 @@ class CocktailApp
     end
     new_drink.instructions = instructions
   end
+
+  #### FAVORITES ####
+
 
   def favorites
     choices = ['Browse Favorites', 'Edit a Favorite', 'Remove a Favorite', 'Back to Main Menu']
@@ -245,9 +250,6 @@ class CocktailApp
   end
 
   def display_fav_drink #(drink)
-    # drink = drink[0]
-
-    #returns a drink chosen thru menu
     drink = view_favorites
     puts drink.name
     drink_ingredients = DrinkIngredient.all.filter{|di| di.drink_id == drink.id}
@@ -259,27 +261,65 @@ class CocktailApp
     favorites
   end
 
-  #### this method doesn't work yet####
+  #### this method doesn't fully work yet####
   def edit_favorite
     puts "Pick a favorite to edit"
     edit_drink = view_favorites
-    # 
-    if edit_drink.user_id != @user.id 
-      puts "Sorry you don't have access to edit that drink"
-    else 
-      name = $prompt.yes?("Is the name #{edit_drink.name} good?")
-      if name == 'no'
-
-      end
-      # ingredient = $prompt.yes?("Is the name #{edit_drink.name} good?")
-      # if ingredient == 'no'
-
-      # end
-
-
+    choices = ['Change the name', 'Add an ingredient', 'Remove an ingredient', 'Change the instructions', 'Main Menu']
+    edit_fav_response = $prompt.multi_select("Which would you like to edit:", choices, required: true, max: 1)
+    if edit_fav_response == ['Change the name']
+      edit_fav_name(edit_drink)
+    elsif edit_fav_response == ['Add an ingredient']
+      add_fav_ingredient(edit_drink)
+    elsif edit_fav_response == ['Remove an ingredient']
+      delete_fav_ingredient(edit_drink)
+    elsif edit_fav_response == ['Change the instructions']
+      edit_fav_instructions(edit_drink)
+    else
+      main_menu
     end
-
     favorites
+  end
+  
+  def edit_fav_name(drink)
+    new_name = $prompt.ask("Enter a new name:", required: true)
+    drink.name = new_name
+    drink.save
+    main_menu
+  end
+
+  def list_drink_ingredients(drink)
+    # find all DrinkIngredients instances for drink
+    drink_ings = DrinkIngredient.all.filter{|di| di.drink_id == drink.id}
+  end
+
+  def add_fav_ingredient(drink)
+    ingredient = $prompt.ask("Ingredient name?" , required: true) do |q|
+      q.modify :down, :strip
+    end
+    new_ingredient = Ingredient.find_or_create_by(name: ingredient)
+    measurement = $prompt.ask("How much of #{ingredient}?" , required: true) do |q|
+      q.modify :down, :strip
+    end
+    DrinkIngredient.create(drink_id: drink.id, ingredient_id: new_ingredient.id,measurement: measurement)
+    main_menu
+  end
+  
+  def delete_fav_ingredient(drink)
+    puts 'Not available yet, sorry'
+    main_menu
+    # drink_ings = list_drink_ingredients(drink)
+    # ingredients = drink_ings.map do |di|
+    #   Ingredient.all.filter{|i| di.id == i.id}
+    # end
+    # binding.pry
+    # choices = 
+  end
+
+  def edit_fav_instructions(drink)
+    drink.instructions = $prompt.ask("Enter new instructions:", required: true)
+    drink.save
+    main_menu
   end
 
   def remove_favorite
