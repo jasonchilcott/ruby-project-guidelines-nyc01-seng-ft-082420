@@ -27,11 +27,22 @@ class GetDrinks
     # JSON.parse(response.body)
     # response.body
     drinks_hash = JSON.parse(response.body)
-    if drinks_hash["drinks"] = "None Found"
+    if drinks_hash["drinks"] == "None Found"
       return 'None Found'
-    else drinks_hash["drinks"].map{|d| d['strDrink']}
+    else 
+      drinks_hash["drinks"].map{|d| d['strDrink']}
 
     end
+  end
+
+  def get_drink_by_name(name)
+    # binding.pry
+    name = name.split(' ').join('_')
+    base = 'https://www.thecocktaildb.com/api/json/v1/1/search.php?s='
+    url = "#{base}#{name}"
+    uri = URI.parse(url)
+    response = Net::HTTP.get_response(uri)
+    drink_hash = JSON.parse(response.body)
   end
   
   # def get_drink_names
@@ -71,14 +82,14 @@ class GetDrinks
     #binding.pry
   end
   
-  def get_drink_by_id(id)
-    id_url = "https://www.thecocktaildb.com/api/json/v1/1/lookup.php?iid=#{id}"
-    uri = URI.parse(id_url)
-    response = Net::HTTP.get_response(uri)
-    # JSON.parse(response.body)
-    response.body
-  end
+  # def get_drink_by_id(id)
+  #   id_url = "https://www.thecocktaildb.com/api/json/v1/1/lookup.php?iid=#{id}"
+  #   uri = URI.parse(id_url)
+  #   response = Net::HTTP.get_response(uri)
+  #   # JSON.parse(response.body)
+  #   response.body
+  # end
 end
 
-new = GetDrinks.new
-puts new.get_drinks('vodka gin rum')
+# new = GetDrinks.new
+# puts new.get_drinks('vodka gin rum')

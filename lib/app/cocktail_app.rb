@@ -93,8 +93,6 @@ class CocktailApp
   end
 
   def find_drink_by_ingredients
-
-    
     ing_one = $prompt.ask("First Search Ingredient:", required: true)
     ing_two = $prompt.ask("Another Ingredient:")
     ing_three = $prompt.ask("One More Ingredient:")
@@ -105,22 +103,51 @@ class CocktailApp
     if drink_names == "None Found"
       find_drink_by_ingredients
     else
-    
+      drink_names_menu(drink_names)
     end
   end
   
   def drink_names_menu(drinks)
-    # turns drinks array into menu options
-
-    
-    # calls find_drink_by_name()
+    drinks = drinks.sample(8)
+    drink_names_response = $prompt.multi_select("Try one of these: ", drinks, required: true, max: 1)
+    find_drink_by_name(drink_names_response[0])
   end
   
-  def find_drink_by_name
-    # displays drink
-    # find_drink = GetDrinks.new('drink_name')
-    # find_drink.get_drink_with_instructions
-    # with question prompt at the bottom to return to drink array or main menu
+  def find_drink_by_name(drink_name)
+    new = GetDrinks.new
+    drink_data = new.get_drink_by_name(drink_name)
+    display_drink_data(drink_data)
+  end
+
+  def display_drink_data(data)
+    data = data["drinks"][0]
+    puts "Name: #{data["strDrink"]}"
+    # iterate through 15 ingredients!!!!
+    ingredient_iterator(data)
+    puts "Instructions: #{data["strInstructions"]}"
+    abort
+  end
+
+  def ingredient_iterator(data)
+    receipe_hash = {}
+    # data["strIngredient1"] : data["strMeasure1"]
+    i = 1
+    while i < 16 do 
+      key = data["strIngredient#{i}"]
+      value = data["strMeasure#{i}"]
+      receipe_hash[key] = value
+      i+= 1
+    end
+    display_receipe_hash(receipe_hash)
+  end
+
+  def display_receipe_hash(receipe_hash)
+    receipe_hash.each do |k,v|
+      if v != nil
+        # binding.pry
+        puts "#{k}: #{v}"
+      end
+    end
   end
 
   def add_user_drink
