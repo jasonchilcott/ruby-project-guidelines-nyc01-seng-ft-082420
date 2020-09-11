@@ -11,10 +11,10 @@ class CocktailApp
   end
 
   private
-
-  # methods down here
-
+  
   $prompt = TTY::Prompt.new
+
+  #### WELCOME - SIGN UP - LOG IN - MAIN MENU ####
 
   def welcome
     puts "Welcome to the Cocktail App"
@@ -220,6 +220,9 @@ class CocktailApp
     new_drink.instructions = instructions
   end
 
+  #### FAVORITES ####
+
+
   def favorites
     choices = ['Browse Favorites', 'Edit a Favorite', 'Remove a Favorite', 'Back to Main Menu']
     favorites_response = $prompt.multi_select('Favorites: ', choices, required: true, max: 1)
@@ -265,23 +268,33 @@ class CocktailApp
   def edit_favorite
     puts "Pick a favorite to edit"
     edit_drink = view_favorites
-    # 
-    if edit_drink.user_id != @user.id 
-      puts "Sorry you don't have access to edit that drink"
-    else 
-      name = $prompt.yes?("Is the name #{edit_drink.name} good?")
-      if name == 'no'
-
-      end
-      # ingredient = $prompt.yes?("Is the name #{edit_drink.name} good?")
-      # if ingredient == 'no'
-
-      # end
-
-
+    choices = ['Change the name', 'Add an ingredient', 'Remove an ingredient', 'Change the instructions', 'Main Menu']
+    edit_fav_response = $prompt.multi_select("Which would you like to edit:", choices, required: true, max: 1)
+    if edit_fav_response == ['Change the name']
+      edit_fav_name(edit_drink)
+    elsif edit_fav_response == ['Add an ingredient']
+      
+    elsif edit_fav_response == ['Remove an ingredient']
+      
+    elsif edit_fav_response == ['Change the instructions']
+      edit_fav_instructions(edit_drink)
+    else
+      main_menu
     end
-
     favorites
+  end
+  
+  def edit_fav_name(drink)
+    new_name = $prompt.ask("Enter a new name:", required: true)
+    drink.name = new_name
+    drink.save
+    edit_favorite
+  end
+
+  def edit_fav_instructions(drink)
+    drink.instructions = $prompt.ask("Enter new instructions:", required: true)
+    drink.save
+    edit_favorite
   end
 
   def remove_favorite
