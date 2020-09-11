@@ -6,7 +6,7 @@ UserDrink.destroy_all
 
 gin_tonic = Drink.create(name: "Gin and Tonic", user_id: nil, alcoholic: true, instructions: 'mix them together on ice')
 old = Drink.create(name: "Old Fashioned", user_id: nil, alcoholic: true)
-vod_red = Drink.create(name: "Vodka Red Bull", user_id: nil, alcoholic: true, instructions: 'duh')
+vod_red = Drink.create(name: "Vodka Red Bull", user_id: nil, alcoholic: true, instructions: 'mix together')
 bloody = Drink.create(name: "Bloody Mary", user_id: nil, alcoholic: true)
 virgin_coke = Drink.create(name: "Virgin Coke", user_id: nil, alcoholic: false, instructions: 'it is just coke and ice, do not mess this up')
 
@@ -28,7 +28,7 @@ di5 = DrinkIngredient.create(drink_id: vod_red.id, ingredient_id: vodka.id, meas
 
 
 doc_venture = User.create(name: "Dr. Venture", email: "dr@venture.com", password: "rusty")
-hank = User.create(name: "Hank Venture", email: "hank@venture.com", password: "I'm batman")
+hank = User.create(name: "Hank Venture", email: "hank@venture.com", password: "Batman")
 monarch = User.create(name: "The Monarch", email: "monarch@theguild.com", password: "Fresca")
 
 ud1 = UserDrink.create(user_id: doc_venture.id, drink_id: gin_tonic.id)

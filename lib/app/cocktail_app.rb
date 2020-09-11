@@ -18,7 +18,7 @@ class CocktailApp
 
   def welcome
     puts "Welcome to the Cocktail App"
-    sleep(1.5)
+    sleep(1)
   end
 
   def log_in_or_sign_up
@@ -78,7 +78,7 @@ class CocktailApp
     choices = ['Search for drinks', 'Add your own drink', 'Favorites', 'Exit']
     main_menu_response = $prompt.multi_select("Alright #{@user.name}, what's next? ", choices, required: true, max: 1)
     if main_menu_response == ['Search for drinks']
-      puts "Let's go find you a drink!"
+      # puts "Let's go find you a drink!"
       find_drink_by_ingredients
     elsif main_menu_response == ['Add your own drink']
       # puts "Let's add your own creation!"
@@ -93,9 +93,9 @@ class CocktailApp
   end
 
   def find_drink_by_ingredients
-    ing_one = $prompt.ask("First Search Ingredient:", required: true)
-    ing_two = $prompt.ask("Another Ingredient:")
-    ing_three = $prompt.ask("One More Ingredient:")
+    ing_one = $prompt.ask("Add an ingredient:", required: true)
+    ing_two = $prompt.ask("Another ingredient:")
+    ing_three = $prompt.ask("One more ingredient:")
     ingredients = "#{ing_one} #{ing_two} #{ing_three}"
     new = GetDrinks.new
     drink_names = new.get_drinks(ingredients)
@@ -196,7 +196,7 @@ class CocktailApp
   end
 
   def add_ingredient(new_drink)
-    ingredient = $prompt.ask("Ingredient Name?" , required: true) do |q|
+    ingredient = $prompt.ask("Ingredient name?" , required: true) do |q|
       q.modify :down, :strip
     end
     new_ingredient = Ingredient.find_or_create_by(name: ingredient)
