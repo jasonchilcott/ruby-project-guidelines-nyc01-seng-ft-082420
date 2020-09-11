@@ -250,9 +250,6 @@ class CocktailApp
   end
 
   def display_fav_drink #(drink)
-    # drink = drink[0]
-
-    #returns a drink chosen thru menu
     drink = view_favorites
     puts drink.name
     drink_ingredients = DrinkIngredient.all.filter{|di| di.drink_id == drink.id}
@@ -264,7 +261,7 @@ class CocktailApp
     favorites
   end
 
-  #### this method doesn't work yet####
+  #### this method doesn't fully work yet####
   def edit_favorite
     puts "Pick a favorite to edit"
     edit_drink = view_favorites
@@ -273,9 +270,9 @@ class CocktailApp
     if edit_fav_response == ['Change the name']
       edit_fav_name(edit_drink)
     elsif edit_fav_response == ['Add an ingredient']
-      
+      add_fav_ingredient(edit_drink)
     elsif edit_fav_response == ['Remove an ingredient']
-      
+      delete_fav_ingredient(edit_drink)
     elsif edit_fav_response == ['Change the instructions']
       edit_fav_instructions(edit_drink)
     else
@@ -288,13 +285,41 @@ class CocktailApp
     new_name = $prompt.ask("Enter a new name:", required: true)
     drink.name = new_name
     drink.save
-    edit_favorite
+    main_menu
+  end
+
+  def list_drink_ingredients(drink)
+    # find all DrinkIngredients instances for drink
+    drink_ings = DrinkIngredient.all.filter{|di| di.drink_id == drink.id}
+  end
+
+  def add_fav_ingredient(drink)
+    ingredient = $prompt.ask("Ingredient name?" , required: true) do |q|
+      q.modify :down, :strip
+    end
+    new_ingredient = Ingredient.find_or_create_by(name: ingredient)
+    measurement = $prompt.ask("How much of #{ingredient}?" , required: true) do |q|
+      q.modify :down, :strip
+    end
+    DrinkIngredient.create(drink_id: drink.id, ingredient_id: new_ingredient.id,measurement: measurement)
+    main_menu
+  end
+  
+  def delete_fav_ingredient(drink)
+    puts 'Not available yet, sorry'
+    main_menu
+    # drink_ings = list_drink_ingredients(drink)
+    # ingredients = drink_ings.map do |di|
+    #   Ingredient.all.filter{|i| di.id == i.id}
+    # end
+    # binding.pry
+    # choices = 
   end
 
   def edit_fav_instructions(drink)
     drink.instructions = $prompt.ask("Enter new instructions:", required: true)
     drink.save
-    edit_favorite
+    main_menu
   end
 
   def remove_favorite
