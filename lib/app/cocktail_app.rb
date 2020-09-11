@@ -180,8 +180,22 @@ class CocktailApp
     end
     add_ingredient(new_drink)
     add_instructions(new_drink)
-    # review drink - setup with same structure as a normal drink layout
+    review_new_drink(new_drink)
+    
+    # press enter to return to view favs
+    
     main_menu
+  end
+
+  def review_new_drink
+    puts "Here's what your new drink looks like:"
+    puts new_drink.name
+    drink_ingredients = DrinkIngredient.all.filter{|di| di.drink_id == new_drink.id}
+    drink_ingredients.each do | drink_ingred|
+      puts "#{drink_ingred.ingredient.name}: #{drink_ingred.measurement}"
+    end
+    puts new_drink.instructions
+
   end
 
   def add_ingredient(new_drink)
@@ -208,11 +222,9 @@ class CocktailApp
   end
 
   def favorites
-    # add menu here
     choices = ['Browse Favorites', 'Edit a Favorite', 'Remove a Favorite', 'Back to Main Menu']
     favorites_response = $prompt.multi_select('Favorites: ', choices, required: true, max: 1)
     if favorites_response == ['Browse Favorites']
-      # view_favorites
       display_fav_drink
     elsif favorites_response == ['Edit a Favorite']
       edit_favorite
@@ -221,7 +233,6 @@ class CocktailApp
     elsif favorites_response == ['Back to Main Menu']
       main_menu
     end
-    # view favs, edit favs, delete a fav
   end
   
   def view_favorites
@@ -238,6 +249,8 @@ class CocktailApp
 
   def display_fav_drink #(drink)
     # drink = drink[0]
+
+    #returns a drink chosen thru menu
     drink = view_favorites
     puts drink.name
     drink_ingredients = DrinkIngredient.all.filter{|di| di.drink_id == drink.id}
@@ -249,6 +262,7 @@ class CocktailApp
     favorites
   end
 
+  #### this method doesn't work yet####
   def edit_favorite
     puts "Pick a favorite to edit"
     edit_drink = view_favorites
