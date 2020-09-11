@@ -78,19 +78,19 @@ class CocktailApp
     choices = ['Search for drinks', 'Add your own drink', 'Favorites', 'Exit']
     main_menu_response = $prompt.multi_select("Alright #{@user.name}, what's next? ", choices, required: true, max: 1)
     if main_menu_response == ['Search for drinks']
-      # puts "Let's go find you a drink!"
       find_drink_by_ingredients
     elsif main_menu_response == ['Add your own drink']
-      # puts "Let's add your own creation!"
       add_user_drink
     elsif main_menu_response == ['Favorites']
-      # puts "Let's checkout your favorites"
       favorites
     elsif main_menu_response == ['Exit']
       puts "Goodbye"
       abort
     end
   end
+
+  #### SEARCH FOR DRINK #####
+
 
   def find_drink_by_ingredients
     ing_one = $prompt.ask("Add an ingredient:", required: true)
@@ -168,6 +168,8 @@ class CocktailApp
       end
     end
   end
+
+  #### ADD YOUR OWN DRINK #####
 
   def add_user_drink
     drink_name = $prompt.ask("What do you want to call your drink?" , required: true)
