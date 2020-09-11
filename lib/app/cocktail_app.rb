@@ -189,8 +189,3 @@ class CocktailApp
 
 end
 # binding.pry
-
-
-# To Display Favorite Drink:
-
-# Find Drink instance w/ Name
