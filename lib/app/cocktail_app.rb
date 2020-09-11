@@ -79,6 +79,7 @@ class CocktailApp
     main_menu_response = $prompt.multi_select("Alright #{@user.name}, what's next? ", choices, required: true, max: 1)
     if main_menu_response == ['Search for drinks']
       puts "Let's go find you a drink!"
+      find_drink_by_ingredients
     elsif main_menu_response == ['Add your own drink']
       # puts "Let's add your own creation!"
       add_user_drink
@@ -92,20 +93,20 @@ class CocktailApp
   end
 
   def find_drink_by_ingredients
-    # "Please enter an igredient"
-    # would you like to enter another (repeat until they say no)
-    
-    ## unsure how to structure api call here ##
-    ## how many ingredients can we search by - can we get the api to do all the work here? ###
-    
-    #builds an array of 10 drinks
-
-    #calls drink_names_menu(array_of_10_drinks)
 
     
-    #############might need this code #############
-    #  new_ingredient = GetDrinks.new(ingredient)
-    #  new_ingredient
+    ing_one = $prompt.ask("First Search Ingredient:", required: true)
+    ing_two = $prompt.ask("Another Ingredient:")
+    ing_three = $prompt.ask("One More Ingredient:")
+    ingredients = "#{ing_one} #{ing_two} #{ing_three}"
+    new = GetDrinks.new
+    drink_names = new.get_drinks(ingredients)
+    
+    if drink_names == "None Found"
+      find_drink_by_ingredients
+    else
+    
+    end
   end
   
   def drink_names_menu(drinks)
@@ -203,19 +204,32 @@ class CocktailApp
   end
 
   def edit_favorite
-    puts "let's edit a fav"
+    puts "Pick a favorite to edit"
+    edit_drink = view_favorites
+    # 
+    if edit_drink.user_id != @user.id 
+      puts "Sorry you don't have access to edit that drink"
+    else 
+      name = $prompt.yes?("Is the name #{edit_drink.name} good?")
+      if name == 'no'
 
-    # favorites
+      end
+      # ingredient = $prompt.yes?("Is the name #{edit_drink.name} good?")
+      # if ingredient == 'no'
+
+      # end
+
+
+    end
+
+    favorites
   end
 
   def remove_favorite
-    puts "let's removed a fav"
+    puts "Pick a favorite to remove: "
     remove_drink = view_favorites
-
-    # find UserDrink where drink_id == remove_drink.id
     remove = UserDrink.all.find{|ud| ud.drink_id == remove_drink.id && ud.user_id == @user.id}
     UserDrink.delete(remove.id)
-
     favorites
   end
 end
