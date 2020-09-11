@@ -80,10 +80,10 @@ class CocktailApp
     if main_menu_response == ['Search for drinks']
       puts "Let's go find you a drink!"
     elsif main_menu_response == ['Add your own drink']
-      puts "Let's add your own creation!"
+      # puts "Let's add your own creation!"
       add_user_drink
     elsif main_menu_response == ['Favorites']
-      puts "Let's checkout your favorites"
+      # puts "Let's checkout your favorites"
       favorites
     elsif main_menu_response == ['Exit']
       puts "Goodbye"
@@ -162,6 +162,18 @@ class CocktailApp
 
   def favorites
     # add menu here
+    choices = ['Browse Favorites', 'Edit a Favorite', 'Remove a Favorite', 'Back to Main Menu']
+    favorites_response = $prompt.multi_select('Favorites: ', choices, required: true, max: 1)
+    if favorites_response == ['Browse Favorites']
+      # view_favorites
+      display_fav_drink
+    elsif favorites_response == ['Edit a Favorite']
+      edit_favorite
+    elsif favorites_response == ['Remove a Favorite']
+      remove_favorite
+    elsif favorites_response == ['Back to Main Menu']
+      main_menu
+    end
     # view favs, edit favs, delete a fav
   end
   
@@ -170,14 +182,16 @@ class CocktailApp
     fav_array = favorites.map do |f|
       f.name 
     end
-    favorites_response = $prompt.multi_select("Choose a drink to view:", fav_array, required: true, max: 1)
-    current_drink = Drink.all.filter{|d| d.name == favorites_response[0]}
+    view_favorites_response = $prompt.multi_select("Choose a drink:", fav_array, required: true, max: 1)
+    current_drink = Drink.all.filter{|d| d.name == view_favorites_response[0]}
     current_drink = current_drink[0]
-    display_fav_drink(current_drink) 
+    # display_fav_drink(current_drink)
+    current_drink 
   end
 
-  def display_fav_drink(drink)
+  def display_fav_drink #(drink)
     # drink = drink[0]
+    drink = view_favorites
     puts drink.name
     drink_ingredients = DrinkIngredient.all.filter{|di| di.drink_id == drink.id}
     drink_ingredients.each do | drink_ingred|
@@ -185,7 +199,24 @@ class CocktailApp
     end
     puts drink.instructions
     # press enter to return to view favs
+    favorites
   end
 
+  def edit_favorite
+    puts "let's edit a fav"
+
+    # favorites
+  end
+
+  def remove_favorite
+    puts "let's removed a fav"
+    remove_drink = view_favorites
+
+    # find UserDrink where drink_id == remove_drink.id
+    remove = UserDrink.all.find{|ud| ud.drink_id == remove_drink.id && ud.user_id == @user.id}
+    UserDrink.delete(remove.id)
+
+    favorites
+  end
 end
 # binding.pry
